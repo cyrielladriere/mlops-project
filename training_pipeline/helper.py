@@ -1,7 +1,6 @@
 """Helper functions for the MLOps Project."""
-from io import BytesIO
 from typing import Any, Dict, List
-import pickle
+import pickle  # nosec
 
 import pandas as pd
 import numpy as np
@@ -14,13 +13,14 @@ from transformers import BertForSequenceClassification
 
 LABEL_ENCODER_LOC = "training_pipeline/data/label_encoder.pkl"
 
+
 def train_model(
     model: BertForSequenceClassification,
     train_dataloader: DataLoader[Dict[str, torch.Tensor]],
     optimizer: torch.optim.Optimizer,
     scheduler: torch.optim.lr_scheduler._LRScheduler,
     device: torch.device,
-    num_epochs: int
+    num_epochs: int,
 ) -> None:
     """Train the BERT model for news category classification."""
     model.train()
@@ -46,7 +46,7 @@ def train_model(
 
             preds = outputs.logits.detach().cpu().numpy()
             labels = batch["label"].float().detach().cpu().numpy()
-            
+
             all_preds.append(preds)
             all_labels.append(labels)
 
@@ -63,7 +63,7 @@ def eval_model(
     model: BertForSequenceClassification,
     dataloader: DataLoader,
     label_encoder: LabelEncoder,
-    device: torch.device
+    device: torch.device,
 ) -> np.ndarray:
     """Predict news category for news articles using the trained model."""
     model.eval()
@@ -97,7 +97,7 @@ def predict_categories(
     model: BertForSequenceClassification,
     dataloader: DataLoader,
     label_encoder: LabelEncoder,
-    device: torch.device
+    device: torch.device,
 ) -> np.ndarray:
     """Predict news category for news articles using the trained model."""
     model.eval()
@@ -124,19 +124,19 @@ def load_data(data_file: str) -> pd.DataFrame:
 
     return df[["category", "short_description"]]
 
+
 def get_label_encoder(df: pd.DataFrame | None = None):
     if df is None:
-        with open(LABEL_ENCODER_LOC, 'rb') as file:
-            return pickle.load(file)
-        
+        with open(LABEL_ENCODER_LOC, "rb") as file:
+            return pickle.load(file)  # nosec
+
     label_encoder = LabelEncoder()
     label_encoder.fit(df["category"])
 
-    with open(LABEL_ENCODER_LOC, 'wb') as file:
+    with open(LABEL_ENCODER_LOC, "wb") as file:
         pickle.dump(label_encoder, file)
-    
-    return label_encoder
 
+    return label_encoder
 
 
 def preprocess_dataset(data: pd.DataFrame, tokenizer) -> Dataset:
@@ -145,7 +145,10 @@ def preprocess_dataset(data: pd.DataFrame, tokenizer) -> Dataset:
 
     def tokenize_dataset(examples: Dict[str, List[str]]) -> Any:
         return tokenizer(
-            examples["short_description"], padding="max_length", truncation=True, max_length=512
+            examples["short_description"],
+            padding="max_length",
+            truncation=True,
+            max_length=512,
         )
 
     dataset = dataset.map(tokenize_dataset, batched=True)
@@ -154,14 +157,12 @@ def preprocess_dataset(data: pd.DataFrame, tokenizer) -> Dataset:
 
     return dataset
 
+
 def compute_metrics(pred, labels):
     labels = labels.argmax(-1)
     preds = pred.argmax(-1)
-    precision, recall, f1, _ = precision_recall_fscore_support(labels, preds, average='weighted')
+    precision, recall, f1, _ = precision_recall_fscore_support(
+        labels, preds, average="weighted"
+    )
     acc = accuracy_score(labels, preds)
-    return {
-        'accuracy': acc,
-        'f1': f1,
-        'precision': precision,
-        'recall': recall
-    }
+    return {"accuracy": acc, "f1": f1, "precision": precision, "recall": recall}
