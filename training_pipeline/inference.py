@@ -7,13 +7,12 @@ from transformers import (
     BertTokenizer,
 )
 
+from training_pipeline.config import MODEL_LOCATION
 from training_pipeline.utils import (
     get_label_encoder,
     load_data,
     preprocess_dataset,
 )
-
-MODEL_LOCATION = "full_model.pt"
 
 
 def predict(input_json):

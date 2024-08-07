@@ -1,5 +1,3 @@
-from typing import Dict
-
 import torch
 import numpy as np
 from torch.utils.data import DataLoader
@@ -9,16 +7,14 @@ from transformers import (
     BertTokenizer,
 )
 
+from training_pipeline.config import DATA_LOCATION
 from training_pipeline.utils import (
     compute_metrics,
     get_label_encoder,
     load_data,
     preprocess_dataset,
 )
-from keras.utils import to_categorical
-
-DATA_LOCATION = "training_pipeline/data/news_data.json"
-MODEL_LOCATION = "full_model.pt"
+from keras.utils import to_categorical  # type: ignore
 
 
 def train() -> None:
@@ -62,23 +58,9 @@ def train() -> None:
     device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
     model.to(device)
 
-    training_loop(model, train_dataloader, optimizer, scheduler, device, num_epochs)
-
-    # preds = eval_model(model, test_dataloader, label_encoder, device)
-    # datasets["test"] = datasets["test"].add_column("predictions", preds)
-
-
-def training_loop(
-    model: BertForSequenceClassification,
-    train_dataloader: DataLoader[Dict[str, torch.Tensor]],
-    optimizer: torch.optim.Optimizer,
-    scheduler: torch.optim.lr_scheduler._LRScheduler,
-    device: torch.device,
-    num_epochs: int,
-) -> None:
-    """Train the BERT model for news category classification."""
     model.train()
 
+    # Training loop
     for epoch in range(1, num_epochs + 1):
         all_preds = []
         all_labels = []
@@ -111,6 +93,9 @@ def training_loop(
         print("Performance model on train set: ", metrics)
 
     torch.save(model.state_dict(), "./model.pt")
+
+    # preds = eval_model(model, test_dataloader, label_encoder, device)
+    # datasets["test"] = datasets["test"].add_column("predictions", preds)
 
 
 train()
