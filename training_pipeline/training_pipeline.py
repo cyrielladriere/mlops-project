@@ -5,7 +5,7 @@ from training_pipeline.src.train import train_model
 from training_pipeline.src.upload_dataset import upload_data
 
 
-@pipeline(name="breast-cancer-pipeline", description="breast-cancer-pipeline")
+@pipeline(name="news-articles-pipeline", description="news-articles-pipeline")
 def pipeline(
     name=config.PIPELINE_NAME,
 ):

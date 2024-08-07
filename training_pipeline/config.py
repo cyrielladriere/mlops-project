@@ -3,7 +3,7 @@
 MODEL_LOCATION = "full_model.pt"
 DATA_LOCATION = "training_pipeline/data/news_data.json"
 
-PIPELINE_NAME = "new-articles-pipeline"
+PIPELINE_NAME = "news-articles-pipeline"
 
 PROJECT_ID = ""
 REGION = ""
