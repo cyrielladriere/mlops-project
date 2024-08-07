@@ -21,3 +21,13 @@ repos:
       - id: black
         name: black
         files: "^training_pipeline/"
+
+  - repo: https://github.com/antonbabenko/pre-commit-terraform
+    rev: v1.88.0
+    hooks:
+      - id: terraform_fmt
+        args: 
+          - --args=-recursive
+        files: "^terraform/"
+      - id: terraform_validate
+        files: "^terraform/"
