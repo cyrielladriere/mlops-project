@@ -1,12 +1,17 @@
 import numpy as np
 from sklearn.preprocessing import LabelEncoder
 import torch
+from kfp.v2.dsl import component
 from torch.utils.data import DataLoader
 from transformers import BertForSequenceClassification
 
-from training_pipeline.utils import compute_metrics
+from training_pipeline.src.utils import compute_metrics
 
 
+@component(
+    base_image="python:3.10",
+    output_component_file="eval_model.yaml",
+)
 def eval_model(
     model: BertForSequenceClassification,
     dataloader: DataLoader,

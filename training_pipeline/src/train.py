@@ -1,6 +1,7 @@
 import torch
 import numpy as np
 from torch.utils.data import DataLoader
+from kfp.v2.dsl import component
 from transformers import (
     BertForSequenceClassification,
     get_linear_schedule_with_warmup,
@@ -8,7 +9,7 @@ from transformers import (
 )
 
 from training_pipeline.config import DATA_LOCATION
-from training_pipeline.utils import (
+from training_pipeline.src.utils import (
     compute_metrics,
     get_label_encoder,
     load_data,
@@ -17,7 +18,11 @@ from training_pipeline.utils import (
 from keras.utils import to_categorical  # type: ignore
 
 
-def train() -> None:
+@component(
+    base_image="python:3.10",
+    output_component_file="train_model.yaml",
+)
+def train_model() -> None:
     """Train a predictive model to classify news articles into categories."""
     # Get data
     df = load_data(DATA_LOCATION)
@@ -83,19 +88,17 @@ def train() -> None:
             preds = outputs.logits.detach().cpu().numpy()
             labels = batch["label"].float().detach().cpu().numpy()
 
-            all_preds.append(preds)
-            all_labels.append(labels)
+        all_preds.append(preds)
+        all_labels.append(labels)
 
-        all_preds = np.concatenate(all_preds, axis=0)
-        all_labels = np.concatenate(all_labels, axis=0)
+    all_preds = np.concatenate(all_preds, axis=0)
+    all_labels = np.concatenate(all_labels, axis=0)
 
-        metrics = compute_metrics(all_preds, all_labels)
-        print("Performance model on train set: ", metrics)
+    metrics = compute_metrics(all_preds, all_labels)
+    print("Performance model on train set: ", metrics)
 
     torch.save(model.state_dict(), "./model.pt")
+    return metrics
 
     # preds = eval_model(model, test_dataloader, label_encoder, device)
     # datasets["test"] = datasets["test"].add_column("predictions", preds)
-
-
-train()

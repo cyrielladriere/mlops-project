@@ -8,7 +8,7 @@ from transformers import (
 )
 
 from training_pipeline.config import MODEL_LOCATION
-from training_pipeline.utils import (
+from training_pipeline.src.utils import (
     get_label_encoder,
     load_data,
     preprocess_dataset,
