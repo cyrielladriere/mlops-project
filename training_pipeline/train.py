@@ -1,6 +1,7 @@
 from typing import Dict
 
 import torch
+import numpy as np
 from torch.utils.data import DataLoader
 from transformers import (
     BertForSequenceClassification,
@@ -8,13 +9,11 @@ from transformers import (
     BertTokenizer,
 )
 
-from training_pipeline.helper import (
-    eval_model,
+from training_pipeline.utils import (
+    compute_metrics,
     get_label_encoder,
     load_data,
-    predict_categories,
     preprocess_dataset,
-    train_model,
 )
 from keras.utils import to_categorical
 
@@ -44,7 +43,7 @@ def train() -> None:
 
     # DataLoader
     train_dataloader = DataLoader(datasets["train"], shuffle=False, batch_size=8)
-    test_dataloader = DataLoader(datasets["test"], shuffle=False, batch_size=8)
+    DataLoader(datasets["test"], shuffle=False, batch_size=8)
 
     # Model
     model = BertForSequenceClassification.from_pretrained(
@@ -63,40 +62,55 @@ def train() -> None:
     device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
     model.to(device)
 
-    train_model(model, train_dataloader, optimizer, scheduler, device, num_epochs)
+    training_loop(model, train_dataloader, optimizer, scheduler, device, num_epochs)
 
-    preds = eval_model(model, test_dataloader, label_encoder, device)
-    datasets["test"] = datasets["test"].add_column("predictions", preds)
+    # preds = eval_model(model, test_dataloader, label_encoder, device)
+    # datasets["test"] = datasets["test"].add_column("predictions", preds)
 
 
-def predict() -> Dict[int, Dict[int, str]]:
-    """Predict news categories based on news articles using a pre-trained model."""
-    data = load_data(DATA_LOCATION)[:1000]
+def training_loop(
+    model: BertForSequenceClassification,
+    train_dataloader: DataLoader[Dict[str, torch.Tensor]],
+    optimizer: torch.optim.Optimizer,
+    scheduler: torch.optim.lr_scheduler._LRScheduler,
+    device: torch.device,
+    num_epochs: int,
+) -> None:
+    """Train the BERT model for news category classification."""
+    model.train()
 
-    label_encoder = get_label_encoder()
-    n_classes = len(label_encoder.classes_)
+    for epoch in range(1, num_epochs + 1):
+        all_preds = []
+        all_labels = []
+        for i, batch in enumerate(train_dataloader):
+            print(f"[Epoch: {epoch}] batch: {i}/{len(train_dataloader)}")
+            optimizer.zero_grad()
 
-    tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
+            batch = {k: v.to(device) for k, v in batch.items()}
+            outputs = model(
+                input_ids=batch["input_ids"],
+                attention_mask=batch["attention_mask"],
+                labels=batch["label"].float(),
+            )
 
-    model = BertForSequenceClassification.from_pretrained(
-        "bert-base-uncased", num_labels=n_classes
-    )
+            loss = outputs.loss
+            loss.backward()
+            optimizer.step()
+            scheduler.step()
 
-    device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
-    model.load_state_dict(torch.load(MODEL_LOCATION))
-    model.to(device)
+            preds = outputs.logits.detach().cpu().numpy()
+            labels = batch["label"].float().detach().cpu().numpy()
 
-    # Preprocess and tokenize dataset
-    dataset = preprocess_dataset(data, tokenizer)
+            all_preds.append(preds)
+            all_labels.append(labels)
 
-    dataloader = DataLoader(dataset, shuffle=False, batch_size=8)
+        all_preds = np.concatenate(all_preds, axis=0)
+        all_labels = np.concatenate(all_labels, axis=0)
 
-    results = predict_categories(model, dataloader, label_encoder, device)
+        metrics = compute_metrics(all_preds, all_labels)
+        print("Performance model on train set: ", metrics)
 
-    # # Append results to original dataset
-    # dataset = dataset.add_column("predictions", results)
-
-    return results
+    torch.save(model.state_dict(), "./model.pt")
 
 
 train()
