@@ -7,7 +7,7 @@ from sklearn.metrics import precision_recall_fscore_support, accuracy_score
 from sklearn.preprocessing import LabelEncoder
 from datasets import Dataset
 
-LABEL_ENCODER_LOC = "training_pipeline/data/label_encoder.pkl"
+from training_pipeline.config import LABEL_ENCODER_LOC
 
 
 def load_data(data_file: str) -> pd.DataFrame:

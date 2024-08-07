@@ -1,11 +1,10 @@
 import numpy as np
-from sklearn.preprocessing import LabelEncoder
 import torch
 from kfp.v2.dsl import component
 from torch.utils.data import DataLoader
 from transformers import BertForSequenceClassification
 
-from training_pipeline.src.utils import compute_metrics
+from training_pipeline.src.utils import compute_metrics, get_label_encoder
 
 
 @component(
@@ -15,10 +14,12 @@ from training_pipeline.src.utils import compute_metrics
 def eval_model(
     model: BertForSequenceClassification,
     dataloader: DataLoader,
-    label_encoder: LabelEncoder,
-    device: torch.device,
 ) -> np.ndarray:
     """Predict news category for news articles using the trained model."""
+    device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
+
+    label_encoder = get_label_encoder()
+
     model.eval()
     all_preds = []
     all_labels = []

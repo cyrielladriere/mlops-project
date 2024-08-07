@@ -9,13 +9,13 @@ from training_pipeline.src.upload_dataset import upload_data
 def pipeline(
     name=config.PIPELINE_NAME,
 ):
-    import_data_op = upload_data(
-        dataset_id=config.DATASET_ID, file_bucket=config.FILE_BUCKET
+    import_data_op = upload_data()
+
+    model_training_op = train_model(import_data_op.output)
+
+    model_evaluation_op = eval_model(
+        model_training_op.outputs["model"], model_training_op.outputs["test_dataloader"]
     )
-
-    model_training_op = train_model()
-
-    model_evaluation_op = eval_model()
 
     model_training_op.after(import_data_op)
     model_evaluation_op.after(model_training_op)

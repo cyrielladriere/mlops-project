@@ -1,7 +1,7 @@
 from kfp.v2.dsl import component
 
-from training_pipeline.config import DATA_LOCATION
-from training_pipeline.src.utils import load_data
+from training_pipeline.config import DATA_LOCATION, DATASET_LOC, LABEL_ENCODER_LOC
+from training_pipeline.src.utils import get_label_encoder, load_data
 
 
 @component(
@@ -13,11 +13,11 @@ def upload_data(
     file_bucket: str,
 ) -> str:
     df = load_data(DATA_LOCATION)
+    label_encoder = get_label_encoder(df)
 
-    # save df in cloud storage
-    save_path = f"gs://{file_bucket}/{dataset_id}/{dataset_id}_data.csv"
-    df.to_csv(save_path, index=True)
+    df.to_csv(DATASET_LOC, index=True)
 
-    print(f"{dataset_id}_data.csv saved in {save_path}")
+    print(f"{dataset_id}_data.csv saved in {DATA_LOCATION}")
+    print(f"Label encoder saved in {LABEL_ENCODER_LOC}")
 
-    return save_path
+    return label_encoder

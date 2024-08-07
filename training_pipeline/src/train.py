@@ -8,10 +8,9 @@ from transformers import (
     BertTokenizer,
 )
 
-from training_pipeline.config import DATA_LOCATION
+from training_pipeline.config import DATASET_LOC
 from training_pipeline.src.utils import (
     compute_metrics,
-    get_label_encoder,
     load_data,
     preprocess_dataset,
 )
@@ -22,14 +21,14 @@ from keras.utils import to_categorical  # type: ignore
     base_image="python:3.10",
     output_component_file="train_model.yaml",
 )
-def train_model() -> None:
+def train_model(label_encoder):
     """Train a predictive model to classify news articles into categories."""
     # Get data
-    df = load_data(DATA_LOCATION)
+    df = load_data(DATASET_LOC)
 
     # Give df as argument if LabelEncoder does not exist or is out of date
     # label_encoder = get_label_encoder(df)
-    label_encoder = get_label_encoder()
+
     df["label"] = label_encoder.transform(df["category"])
     n_classes = len(label_encoder.classes_)
     df["label"] = df["label"].apply(to_categorical, num_classes=n_classes)
@@ -44,7 +43,7 @@ def train_model() -> None:
 
     # DataLoader
     train_dataloader = DataLoader(datasets["train"], shuffle=False, batch_size=8)
-    DataLoader(datasets["test"], shuffle=False, batch_size=8)
+    test_dataloader = DataLoader(datasets["test"], shuffle=False, batch_size=8)
 
     # Model
     model = BertForSequenceClassification.from_pretrained(
@@ -98,7 +97,4 @@ def train_model() -> None:
     print("Performance model on train set: ", metrics)
 
     torch.save(model.state_dict(), "./model.pt")
-    return metrics
-
-    # preds = eval_model(model, test_dataloader, label_encoder, device)
-    # datasets["test"] = datasets["test"].add_column("predictions", preds)
+    return (model, test_dataloader)
