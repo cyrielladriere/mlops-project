@@ -8,7 +8,7 @@ from transformers import (
     BertTokenizer,
 )
 
-from training_pipeline.config import DATASET_LOC
+from training_pipeline.config import DATASET_LOC, MODEL_LOC
 from training_pipeline.src.utils import (
     compute_metrics,
     load_data,
@@ -96,5 +96,5 @@ def train_model(label_encoder):
     metrics = compute_metrics(all_preds, all_labels)
     print("Performance model on train set: ", metrics)
 
-    torch.save(model.state_dict(), "./model.pt")
+    torch.save(model.state_dict(), MODEL_LOC)
     return (model, test_dataloader)

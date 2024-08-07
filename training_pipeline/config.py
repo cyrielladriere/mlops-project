@@ -13,3 +13,4 @@ DATASET_ID = "news_articles"
 
 DATASET_LOC = f"gs://{FILE_BUCKET}/{DATASET_ID}/{DATASET_ID}_data.csv"
 LABEL_ENCODER_LOC = f"gs://{FILE_BUCKET}/{DATASET_ID}/{DATASET_ID}_label_encoder.pkl"
+MODEL_LOC = f"gs://{FILE_BUCKET}/{DATASET_ID}/{DATASET_ID}_model.pt"
