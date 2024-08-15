@@ -8,9 +8,10 @@ from transformers import (
     BertTokenizer,
 )
 
-from training_pipeline.config import DATASET_LOC, MODEL_LOC
+from training_pipeline.config import DATALOADER_LOC, DATASET_LOC, MODEL_LOC
 from training_pipeline.src.utils import (
     compute_metrics,
+    get_label_encoder,
     load_data,
     preprocess_dataset,
 )
@@ -21,13 +22,13 @@ from keras.utils import to_categorical  # type: ignore
     base_image="python:3.10",
     output_component_file="train_model.yaml",
 )
-def train_model(label_encoder):
+def train_model() -> None:
     """Train a predictive model to classify news articles into categories."""
     # Get data
     df = load_data(DATASET_LOC)
 
     # Give df as argument if LabelEncoder does not exist or is out of date
-    # label_encoder = get_label_encoder(df)
+    label_encoder = get_label_encoder()
 
     df["label"] = label_encoder.transform(df["category"])
     n_classes = len(label_encoder.classes_)
@@ -98,4 +99,4 @@ def train_model(label_encoder):
     print("Performance model on train set: ", metrics)
 
     torch.save(model.state_dict(), MODEL_LOC)
-    return (model, test_dataloader)
+    torch.save(test_dataloader, DATALOADER_LOC)

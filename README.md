@@ -30,3 +30,7 @@ Afterwards, we can use `terraform plan` to see what resources are going to be cr
 ```sh
 terraform plan -var-file="../environment/project.tfvars"
 ```
+When we actually want to apply the changes we can execute `terraform apply`:
+```sh
+terraform apply -var-file="../environment/project.tfvars"
+```

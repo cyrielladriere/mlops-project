@@ -8,7 +8,11 @@ from training_pipeline.training_pipeline import pipeline
 
 
 def deploy_pipeline():
-    aiplatform.init(project=config.PROJECT_ID, location=config.REGION)
+    aiplatform.init(
+        project=config.PROJECT_ID,
+        location=config.REGION,
+        service_account=config.VERTEX_SVC,
+    )
 
     temp_dir = tempfile.mkdtemp()
     temp_path = f"{Path(temp_dir)}/pipeline.yaml"
@@ -20,9 +24,12 @@ def deploy_pipeline():
     job = aiplatform.PipelineJob(
         display_name=config.PIPELINE_NAME,
         template_path=temp_path,
-        parameter_values={"project_id": config.PROJECT_ID},
         enable_caching=True,  # True just for testing, to save resources
         pipeline_root=f"gs://{config.FILE_BUCKET}",
     )
 
     job.run()
+
+
+if __name__ == "__main__":
+    deploy_pipeline()

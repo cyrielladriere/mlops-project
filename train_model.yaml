@@ -1,0 +1,84 @@
+# PIPELINE DEFINITION
+# Name: train-model
+components:
+  comp-train-model:
+    executorLabel: exec-train-model
+deploymentSpec:
+  executors:
+    exec-train-model:
+      container:
+        args:
+        - --executor_input
+        - '{{$}}'
+        - --function_to_execute
+        - train_model
+        command:
+        - sh
+        - -c
+        - "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip ||\
+          \ python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1\
+          \ python3 -m pip install --quiet --no-warn-script-location 'kfp==2.8.0'\
+          \ '--no-deps' 'typing-extensions>=3.7.4,<5; python_version<\"3.9\"' && \"\
+          $0\" \"$@\"\n"
+        - sh
+        - -ec
+        - 'program_path=$(mktemp -d)
+
+
+          printf "%s" "$0" > "$program_path/ephemeral_component.py"
+
+          _KFP_RUNTIME=true python3 -m kfp.dsl.executor_main                         --component_module_path                         "$program_path/ephemeral_component.py"                         "$@"
+
+          '
+        - "\nimport kfp\nfrom kfp import dsl\nfrom kfp.dsl import *\nfrom typing import\
+          \ *\n\ndef train_model() -> None:\n    \"\"\"Train a predictive model to\
+          \ classify news articles into categories.\"\"\"\n    # Get data\n    df\
+          \ = load_data(DATASET_LOC)\n\n    # Give df as argument if LabelEncoder\
+          \ does not exist or is out of date\n    label_encoder = get_label_encoder()\n\
+          \n    df[\"label\"] = label_encoder.transform(df[\"category\"])\n    n_classes\
+          \ = len(label_encoder.classes_)\n    df[\"label\"] = df[\"label\"].apply(to_categorical,\
+          \ num_classes=n_classes)\n\n    tokenizer = BertTokenizer.from_pretrained(\"\
+          bert-base-uncased\")\n\n    # Preprocess and tokenize dataset + train-test\
+          \ split\n    datasets = preprocess_dataset(df, tokenizer).train_test_split(test_size=0.3)\n\
+          \n    # datasets.save_to_disk(\"temp_dataset\")\n    # datasets = load_from_disk(\"\
+          temp_dataset.hf\")\n\n    # DataLoader\n    train_dataloader = DataLoader(datasets[\"\
+          train\"], shuffle=False, batch_size=8)\n    test_dataloader = DataLoader(datasets[\"\
+          test\"], shuffle=False, batch_size=8)\n\n    # Model\n    model = BertForSequenceClassification.from_pretrained(\n\
+          \        \"bert-base-uncased\",\n        num_labels=n_classes,\n    )\n\n\
+          \    # Optimizer and scheduler\n    num_epochs = 1\n    optimizer = torch.optim.AdamW(model.parameters(),\
+          \ lr=5e-5)\n    total_steps = len(datasets[\"train\"]) * num_epochs\n  \
+          \  scheduler = get_linear_schedule_with_warmup(\n        optimizer, num_warmup_steps=0,\
+          \ num_training_steps=total_steps\n    )\n\n    device = torch.device(\"\
+          cuda\") if torch.cuda.is_available() else torch.device(\"cpu\")\n    print(\"\
+          torch device: \", device)\n    model.to(device)\n\n    model.train()\n\n\
+          \    # Training loop\n    for epoch in range(1, num_epochs + 1):\n     \
+          \   all_preds = []\n        all_labels = []\n        for i, batch in enumerate(train_dataloader):\n\
+          \            print(f\"[Epoch: {epoch}] batch: {i}/{len(train_dataloader)}\"\
+          )\n            optimizer.zero_grad()\n\n            batch = {k: v.to(device)\
+          \ for k, v in batch.items()}\n            outputs = model(\n           \
+          \     input_ids=batch[\"input_ids\"],\n                attention_mask=batch[\"\
+          attention_mask\"],\n                labels=batch[\"label\"].float(),\n \
+          \           )\n\n            loss = outputs.loss\n            loss.backward()\n\
+          \            optimizer.step()\n            scheduler.step()\n\n        \
+          \    preds = outputs.logits.detach().cpu().numpy()\n            labels =\
+          \ batch[\"label\"].float().detach().cpu().numpy()\n\n        all_preds.append(preds)\n\
+          \        all_labels.append(labels)\n\n    all_preds = np.concatenate(all_preds,\
+          \ axis=0)\n    all_labels = np.concatenate(all_labels, axis=0)\n\n    metrics\
+          \ = compute_metrics(all_preds, all_labels)\n    print(\"Performance model\
+          \ on train set: \", metrics)\n\n    torch.save(model.state_dict(), MODEL_LOC)\n\
+          \    torch.save(test_dataloader, DATALOADER_LOC)\n\n"
+        image: python:3.10
+pipelineInfo:
+  name: train-model
+root:
+  dag:
+    tasks:
+      train-model:
+        cachingOptions:
+          enableCache: true
+        componentRef:
+          name: comp-train-model
+        taskInfo:
+          name: train-model
+schemaVersion: 2.1.0
+sdkVersion: kfp-2.8.0

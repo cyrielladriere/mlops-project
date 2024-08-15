@@ -1,9 +1,9 @@
 import numpy as np
 import torch
 from kfp.v2.dsl import component
-from torch.utils.data import DataLoader
 from transformers import BertForSequenceClassification
 
+from training_pipeline.config import DATALOADER_LOC, MODEL_LOC
 from training_pipeline.src.utils import compute_metrics, get_label_encoder
 
 
@@ -11,14 +11,19 @@ from training_pipeline.src.utils import compute_metrics, get_label_encoder
     base_image="python:3.10",
     output_component_file="eval_model.yaml",
 )
-def eval_model(
-    model: BertForSequenceClassification,
-    dataloader: DataLoader,
-) -> np.ndarray:
+def eval_model() -> None:
     """Predict news category for news articles using the trained model."""
+    dataloader = torch.load(DATALOADER_LOC)
+
     device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 
     label_encoder = get_label_encoder()
+    n_classes = len(label_encoder.classes_)
+
+    model = BertForSequenceClassification.from_pretrained(
+        "bert-base-uncased", num_labels=n_classes
+    )
+    model.load_state_dict(torch.load(MODEL_LOC))
 
     model.eval()
     all_preds = []
@@ -44,4 +49,4 @@ def eval_model(
     print("Performance model on test set: ", metrics)
 
     all_preds = np.argmax(all_preds, axis=1)
-    return label_encoder.inverse_transform(all_preds)
+    print(label_encoder.inverse_transform(all_preds))
