@@ -34,3 +34,9 @@ When we actually want to apply the changes we can execute `terraform apply`:
 ```sh
 terraform apply -var-file="../environment/project.tfvars"
 ```
+
+# Running Kubeflow Pipeline (WIP)
+The Kubeflow Pipeline can be executed by running the following command (currently does not dinish without error):
+```sh
+python -m training_pipeline.deploy
+```
