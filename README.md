@@ -35,6 +35,20 @@ When we actually want to apply the changes we can execute `terraform apply`:
 terraform apply -var-file="../environment/project.tfvars"
 ```
 
+# Building and pushing Docker image
+First, we have to set up authentication:
+```sh
+gcloud auth configure-docker europe-west1-docker.pkg.dev
+```
+
+Once you are authenticated, run the `build_and_push_image.sh` bash script:
+```sh
+./training_pipeline/build_and_push_image.sh 
+```
+This script will build, tag, and push the image to the google cloud artifact registry inside our mlops GCP project.
+
+**Note:** The created image is based on the Dockerfile in `training_pipeline/src/Dockerfile`
+
 # Running Kubeflow Pipeline (WIP)
 The Kubeflow Pipeline can be executed by running the following command (currently does not dinish without error):
 ```sh
