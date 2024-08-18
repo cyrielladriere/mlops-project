@@ -14,3 +14,5 @@ pydocstyle==6.3.0
 torchmetrics==1.4.0
 tensorflow==2.17.0
 pre-commit==3.8.0
+google-cloud-aiplatform==1.62.0
+gcsfs==2023.12.1

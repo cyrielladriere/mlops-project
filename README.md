@@ -45,12 +45,19 @@ Once you are authenticated, run the `build_and_push_image.sh` bash script:
 ```sh
 ./training_pipeline/build_and_push_image.sh 
 ```
-This script will build, tag, and push the image to the google cloud artifact registry inside our mlops GCP project.
+This script will build, tag, and push the image to the google cloud artifact registry inside our mlops GCP project. 
+
+A tip: I enabled image vulnerabilty scanning in the gcp registry by accident and got stuck with a sizeable bill, so do not enable this if it is not necesarry!
 
 **Note:** The created image is based on the Dockerfile in `training_pipeline/src/Dockerfile`
 
-# Running Kubeflow Pipeline (WIP)
-The Kubeflow Pipeline can be executed by running the following command (currently does not dinish without error):
+# Running Kubeflow Pipeline
+The Kubeflow Pipeline can be executed by running the following command (currently does not finish without error):
 ```sh
 python -m training_pipeline.deploy
 ```
+
+# TODO's
+- FIX: For some reason after downloading csv from gcp bucket we have ~2000 nan values in the "short desciption" column (nans were not present before upload to gcp), see `preprocess_dataset` function in `training_pipeline/components/utils.py`.
+- Add logging
+- Create seperate requirements for pipeline containers and development.

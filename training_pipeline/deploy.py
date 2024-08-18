@@ -1,4 +1,5 @@
 from pathlib import Path
+import subprocess  # nosec
 import tempfile
 import warnings
 from google.cloud import aiplatform
@@ -21,11 +22,13 @@ def deploy_pipeline():
         warnings.simplefilter("ignore")
         Compiler().compile(pipeline_func=pipeline, package_path=temp_path)
 
+    subprocess.run(["./training_pipeline/build_and_push_image.sh"])  # nosec
+
     job = aiplatform.PipelineJob(
         display_name=config.PIPELINE_NAME,
         template_path=temp_path,
-        enable_caching=True,  # True just for testing, to save resources
-        pipeline_root=f"gs://{config.FILE_BUCKET}",
+        enable_caching=False,  # True just for testing, to save resources
+        # pipeline_root=f"gs://{config.FILE_BUCKET}",
     )
 
     job.run()

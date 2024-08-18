@@ -1,31 +1,37 @@
+from pathlib import Path
+import tempfile
 import torch
 import numpy as np
 from torch.utils.data import DataLoader
-from kfp.v2.dsl import component
+from kfp.dsl import container_component, ContainerSpec
 from transformers import (
     BertForSequenceClassification,
     get_linear_schedule_with_warmup,
     BertTokenizer,
 )
 
-from training_pipeline.config import DATALOADER_LOC, DATASET_LOC, MODEL_LOC
-from training_pipeline.src.utils import (
+from training_pipeline.config import DATALOADER_NAME, FILE_BUCKET, IMAGE_LOC, MODEL_NAME
+from training_pipeline.components.utils import (
     compute_metrics,
     get_label_encoder,
     load_data,
     preprocess_dataset,
+    upload_blob,
 )
 from keras.utils import to_categorical  # type: ignore
 
 
-@component(
-    base_image="python:3.10",
-    output_component_file="train_model.yaml",
-)
+@container_component
+def train_model_component():
+    return ContainerSpec(
+        image=IMAGE_LOC, command=["python", "-m", "training_pipeline.components.train"]
+    )
+
+
 def train_model() -> None:
     """Train a predictive model to classify news articles into categories."""
     # Get data
-    df = load_data(DATASET_LOC)
+    df = load_data()
 
     # Give df as argument if LabelEncoder does not exist or is out of date
     label_encoder = get_label_encoder()
@@ -71,6 +77,7 @@ def train_model() -> None:
         all_preds = []
         all_labels = []
         for i, batch in enumerate(train_dataloader):
+            # if i > 100: break
             print(f"[Epoch: {epoch}] batch: {i}/{len(train_dataloader)}")
             optimizer.zero_grad()
 
@@ -98,5 +105,16 @@ def train_model() -> None:
     metrics = compute_metrics(all_preds, all_labels)
     print("Performance model on train set: ", metrics)
 
-    torch.save(model.state_dict(), MODEL_LOC)
-    torch.save(test_dataloader, DATALOADER_LOC)
+    temp_dir = tempfile.mkdtemp()
+    model_path = f"{Path(temp_dir)}/{MODEL_NAME}"
+    dataloader_path = f"{Path(temp_dir)}/{DATALOADER_NAME}"
+
+    torch.save(model.state_dict(), model_path)
+    upload_blob(FILE_BUCKET, model_path, MODEL_NAME)
+
+    torch.save(test_dataloader, dataloader_path)
+    upload_blob(FILE_BUCKET, dataloader_path, DATALOADER_NAME)
+
+
+if __name__ == "__main__":
+    train_model()

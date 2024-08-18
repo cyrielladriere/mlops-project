@@ -1,17 +1,17 @@
-from kfp.v2.dsl import pipeline
+from kfp.dsl import pipeline
 from training_pipeline import config
-from training_pipeline.src.eval import eval_model
-from training_pipeline.src.train import train_model
-from training_pipeline.src.upload_dataset import upload_data
+from training_pipeline.components.eval import eval_model_component
+from training_pipeline.components.train import train_model_component
+from training_pipeline.components.upload_dataset import upload_data_component
 
 
 @pipeline(name=config.PIPELINE_NAME, description=config.PIPELINE_NAME)
-def pipeline(name: str = config.PIPELINE_NAME):
-    import_data_op = upload_data()
+def pipeline() -> None:
+    import_data_op = upload_data_component()
 
-    model_training_op = train_model()
+    model_training_op = train_model_component()
 
-    model_evaluation_op = eval_model()
+    model_evaluation_op = eval_model_component()
 
     model_training_op.after(import_data_op)
     model_evaluation_op.after(model_training_op)
