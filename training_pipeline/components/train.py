@@ -1,4 +1,6 @@
 """Creates and runs training component in kfp pipeline."""
+import logging
+import sys
 import tempfile
 from pathlib import Path
 
@@ -27,6 +29,10 @@ from training_pipeline.config import (
     MODEL_NAME,
 )
 
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+logger.addHandler(logging.StreamHandler(sys.stdout))
+
 
 @container_component
 def train_model_component() -> ContainerSpec:
@@ -40,14 +46,16 @@ def train_model_component() -> ContainerSpec:
 def train_model() -> None:
     """Train a predictive model to classify news articles into categories."""
     if not torch.cuda.is_available():
+        logger.error("GPU not available")
         return
 
-    device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
+    device = torch.device("cuda")
 
-    # Get data
+    logger.info("Loading data")
     df = load_data()
 
     # Give df as argument if LabelEncoder does not exist or is out of date
+    logger.info("Loading label encoder")
     label_encoder = get_label_encoder()
 
     df["label"] = label_encoder.transform(df["category"])
@@ -56,17 +64,13 @@ def train_model() -> None:
 
     tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
 
-    # Preprocess and tokenize dataset + train-test split
+    logger.info("Preprocessing and tokenizing dataset")
     datasets = preprocess_dataset(df, tokenizer).train_test_split(test_size=0.3)
 
-    # datasets.save_to_disk("temp_dataset")
-    # datasets = load_from_disk("temp_dataset.hf")
-
-    # DataLoader
     train_dataloader = DataLoader(datasets["train"], shuffle=False, batch_size=8)
     test_dataloader = DataLoader(datasets["test"], shuffle=False, batch_size=8)
 
-    # Model
+    logger.info("Loading pre-trained model")
     model = BertForSequenceClassification.from_pretrained(
         "bert-base-uncased",
         num_labels=n_classes,
@@ -80,12 +84,12 @@ def train_model() -> None:
         optimizer, num_warmup_steps=0, num_training_steps=total_steps
     )
 
-    print("torch device: ", device)
     model.to(device)
 
     model.train()
 
     # Training loop
+    logger.info("Start training")
     for epoch in range(1, num_epochs + 1):
         all_preds = []
         all_labels = []
