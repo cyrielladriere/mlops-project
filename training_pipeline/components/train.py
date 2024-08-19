@@ -10,7 +10,12 @@ from transformers import (
     BertTokenizer,
 )
 
-from training_pipeline.config import DATALOADER_NAME, FILE_BUCKET, IMAGE_LOC, MODEL_NAME
+from training_pipeline.config import (
+    DATALOADER_NAME,
+    FILE_BUCKET,
+    IMAGE_TRAIN_LOC,
+    MODEL_NAME,
+)
 from training_pipeline.components.utils import (
     compute_metrics,
     get_label_encoder,
@@ -24,7 +29,8 @@ from keras.utils import to_categorical  # type: ignore
 @container_component
 def train_model_component():
     return ContainerSpec(
-        image=IMAGE_LOC, command=["python", "-m", "training_pipeline.components.train"]
+        image=IMAGE_TRAIN_LOC,
+        command=["python", "-m", "training_pipeline.components.train"],
     )
 
 

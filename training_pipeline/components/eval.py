@@ -4,7 +4,12 @@ import torch
 from kfp.dsl import container_component, ContainerSpec
 from transformers import BertForSequenceClassification
 
-from training_pipeline.config import DATALOADER_NAME, FILE_BUCKET, IMAGE_LOC, MODEL_NAME
+from training_pipeline.config import (
+    DATALOADER_NAME,
+    FILE_BUCKET,
+    IMAGE_TRAIN_LOC,
+    MODEL_NAME,
+)
 from training_pipeline.components.utils import (
     compute_metrics,
     get_label_encoder,
@@ -15,7 +20,8 @@ from training_pipeline.components.utils import (
 @container_component
 def eval_model_component():
     return ContainerSpec(
-        image=IMAGE_LOC, command=["python", "-m", "training_pipeline.components.eval"]
+        image=IMAGE_TRAIN_LOC,
+        command=["python", "-m", "training_pipeline.components.eval"],
     )
 
 
