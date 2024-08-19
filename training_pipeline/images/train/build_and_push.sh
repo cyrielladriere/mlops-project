@@ -3,7 +3,7 @@
 REPO_NAME="mlops-project-image-repository"
 PROJECT_ID="mlops-project-431716"
 
-IMAGE_NAME="mlops-image"
+IMAGE_NAME="mlops-train"
 REPO_URL="europe-west1-docker.pkg.dev/${PROJECT_ID}/${REPO_NAME}"
 DOCKERFILE_DIR="training_pipeline/images/Dockerfile"
 
