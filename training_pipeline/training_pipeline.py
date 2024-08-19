@@ -15,9 +15,19 @@ def pipeline() -> None:
     """
     import_data_op = upload_data_component().set_cpu_limit(4).set_memory_limit("8G")
 
-    model_training_op = train_model_component().set_gpu_limit(1).set_memory_limit("8G")
+    model_training_op = (
+        train_model_component()
+        .set_gpu_limit(1)
+        .set_accelerator_type("NVIDIA_TESLA_T4")
+        .set_memory_limit("8G")
+    )
 
-    model_evaluation_op = eval_model_component().set_gpu_limit(1).set_memory_limit("8G")
+    model_evaluation_op = (
+        eval_model_component()
+        .set_gpu_limit(1)
+        .set_accelerator_type("NVIDIA_TESLA_T4")
+        .set_memory_limit("8G")
+    )
 
     model_training_op.after(import_data_op)
     model_evaluation_op.after(model_training_op)
