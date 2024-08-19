@@ -4,7 +4,13 @@ This is an end-to-end MLOps project for training and evaluating a machine learni
 !! This repository is a heavy Work In Progress !!
 
 # Problem
-The problem itself is simple: fine-tuning a BERT transformer architecture to classify news articles into news categories. The pre-trained BERT model is imported from huggingface. Data and models are stored in gcp storage buckets. Kubeflow pipelines is used to create the machine learning pipeline in Vertex AI. This pipeline consists of multiple components (more info: [`training_pipeline/README.md`](./training_pipeline/README.md)), each with their own docker container image. These images are built and pushed to the Google Cloud Artifact Registry using the `training_pipeline/images/build_and_push_all.sh` script. All cloud resources and service accounts are created using Terraform (see `terraform` folder).
+The problem itself is simple: fine-tuning a BERT transformer architecture to classify news articles into news categories. 
+
+The pre-trained BERT model is imported from huggingface. Data and models are stored in gcp storage buckets. 
+
+Kubeflow pipelines is used to create the machine learning pipeline in Vertex AI. This pipeline consists of multiple components (more info: [`training_pipeline/README.md`](./training_pipeline/README.md)), each with their own docker container image. These images are built and pushed to the Google Cloud Artifact Registry using the `training_pipeline/images/build_and_push_all.sh` script. 
+
+All cloud resources and service accounts are created using Terraform (see `terraform` folder).
 
 Dataset: https://www.kaggle.com/datasets/rmisra/news-category-dataset?resource=download
 
