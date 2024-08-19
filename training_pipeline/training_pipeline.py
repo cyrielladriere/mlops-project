@@ -13,7 +13,7 @@ def pipeline() -> None:
     Define a Kubeflow pipeline for processing news articles and
     training/evaluating a BERT model on that data.
     """
-    import_data_op = upload_data_component().set_cpu_limit(4).set_memory_limit("8G")
+    import_data_op = upload_data_component().set_cpu_limit("4").set_memory_limit("8G")
 
     model_training_op = (
         train_model_component()
