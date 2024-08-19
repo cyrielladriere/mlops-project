@@ -1,5 +1,7 @@
 """Creates and runs the evaluation component in kfp pipeline."""
 import io
+import logging
+import sys
 
 import numpy as np
 import torch
@@ -18,6 +20,10 @@ from training_pipeline.config import (
     MODEL_NAME,
 )
 
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+logger.addHandler(logging.StreamHandler(sys.stdout))
+
 
 @container_component
 def eval_model_component() -> ContainerSpec:
@@ -31,18 +37,23 @@ def eval_model_component() -> ContainerSpec:
 def eval_model() -> None:
     """Predict news category for news articles using the trained model."""
     if not torch.cuda.is_available():
+        logger.error("GPU not available")
         return
-    device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
+    device = torch.device("cuda")
 
+    logger.info("Fetching dataset from gcp bucket")
     dataloader_bytes = read_blob(FILE_BUCKET, DATALOADER_NAME)
     dataloader = torch.load(io.BytesIO(dataloader_bytes))
 
+    logger.info("Fetching label encoder from gcp bucket")
     label_encoder = get_label_encoder()
     n_classes = len(label_encoder.classes_)
 
+    logger.info("Fetching model weights from gcp bucket")
     model_bytes = read_blob(FILE_BUCKET, MODEL_NAME)
     model_dict = torch.load(io.BytesIO(model_bytes))
 
+    logger.info("Loading pre-trained BERT model")
     model = BertForSequenceClassification.from_pretrained(
         "bert-base-uncased", num_labels=n_classes
     )
@@ -52,6 +63,7 @@ def eval_model() -> None:
     model.eval()
     all_preds = []
     all_labels = []
+    logger.info("Start evaluation")
     for i, batch in enumerate(dataloader):
         # if i > 100: break
         print(f"[Eval] batch: {i}/{len(dataloader)}")
@@ -71,10 +83,12 @@ def eval_model() -> None:
     all_labels = np.concatenate(all_labels, axis=0)
 
     metrics = compute_metrics(all_preds, all_labels)
-    print("Performance model on test set: ", metrics)
+    logger.info(f"Performance model on test set: {metrics}")
 
     all_preds = np.argmax(all_preds, axis=1)
-    print(label_encoder.inverse_transform(all_preds))
+    logger.info(
+        f"Predictions on test set: {label_encoder.inverse_transform(all_preds)}"
+    )
 
 
 if __name__ == "__main__":

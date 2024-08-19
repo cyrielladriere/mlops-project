@@ -1,4 +1,6 @@
 """Creates and runs upload_data component in kfp pipeline."""
+import logging
+import sys
 import tempfile
 from pathlib import Path
 
@@ -12,6 +14,10 @@ from training_pipeline.config import (
     FILE_BUCKET,
     IMAGE_DATALOADER_LOC,
 )
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+logger.addHandler(logging.StreamHandler(sys.stdout))
 
 
 @container_component
@@ -28,14 +34,17 @@ def upload_data_component() -> ContainerSpec:
 
 def upload_data() -> None:
     """Upload data and a fitted label encoder to GCP storage bucket."""
+    logger.info("Reading dataset")
     df = pd.read_json(DATA_LOCATION, lines=True)
 
+    logger.info("Fitting and storing label encoder")
     get_label_encoder(df)
 
     temp_dir = tempfile.mkdtemp()
     temp_path = f"{Path(temp_dir)}/{DATASET_NAME}"
     df.to_csv(temp_path)
 
+    logger.info("Uploading dataset as csv to gcp bucket")
     upload_blob(FILE_BUCKET, temp_path, DATASET_NAME)
 
 
