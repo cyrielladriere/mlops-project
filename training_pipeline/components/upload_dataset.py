@@ -16,6 +16,10 @@ from training_pipeline.config import (
 
 @container_component
 def upload_data_component() -> ContainerSpec:
+    """
+    Defines a Kubeflow container component for uploading data
+    to a GCP storage bucket.
+    """
     return ContainerSpec(
         image=IMAGE_DATALOADER_LOC,
         command=["python", "-m", "training_pipeline.components.upload_dataset"],
@@ -23,6 +27,7 @@ def upload_data_component() -> ContainerSpec:
 
 
 def upload_data() -> None:
+    """Uploads data and a fitted label encoder to GCP storage bucket."""
     df = pd.read_json(DATA_LOCATION, lines=True)
 
     get_label_encoder(df)

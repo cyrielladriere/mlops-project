@@ -12,6 +12,7 @@ from training_pipeline.training_pipeline import pipeline
 
 
 def deploy_pipeline() -> None:
+    """Deploys the Kubeflow pipeline to Google Cloud Vertex AI."""
     aiplatform.init(
         project=config.PROJECT_ID,
         location=config.REGION,

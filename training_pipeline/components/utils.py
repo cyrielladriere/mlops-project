@@ -22,6 +22,10 @@ def load_data() -> pd.DataFrame:
 
 
 def get_label_encoder(df: pd.DataFrame | None = None):
+    """
+    Returns a fitted LabelEncoder for the news articles categories,
+    either loading it from GCS or fitting it on provided data.
+    """
     if df is None:
         bytes = read_blob(FILE_BUCKET, LABEL_ENCODER_NAME)
         return pickle.loads(bytes)  # nosec
@@ -115,6 +119,10 @@ def preprocess_dataset(data: pd.DataFrame, tokenizer) -> Dataset:
 
 
 def compute_metrics(pred: np.ndarray, labels: np.ndarray) -> Dict:
+    """
+    Computes evaluation metrics (accuracy, F1 score, precision and recall)
+    for model predictions.
+    """
     labels = labels.argmax(-1)
     preds = pred.argmax(-1)
     precision, recall, f1, _ = precision_recall_fscore_support(

@@ -9,6 +9,10 @@ from training_pipeline.components.upload_dataset import upload_data_component
 
 @pipeline(name=config.PIPELINE_NAME, description=config.PIPELINE_NAME)
 def pipeline() -> None:
+    """
+    Defines a Kubeflow pipeline for processing news articles and
+    training/evaluating a BERT model on that data.
+    """
     import_data_op = upload_data_component()
 
     model_training_op = train_model_component()
