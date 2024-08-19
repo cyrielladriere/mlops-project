@@ -18,10 +18,14 @@ DATALOADER_NAME = f"{DATASET_ID}_test_dataloader.pt"
 
 VERTEX_SVC = f"svc-vertex@{PROJECT_ID}.iam.gserviceaccount.com"
 
-IMAGE_DATALOADER_LOC = f"europe-west1-docker.pkg.dev/\
-    {PROJECT_ID}/mlops-project-image-repository/\
-    mlops-dataloader:latest"
+IMAGE_DATALOADER_LOC = (
+    "europe-west1-docker.pkg.dev/"
+    f"{PROJECT_ID}/mlops-project-image-repository/"
+    "mlops-dataloader:latest"
+)
 
-IMAGE_TRAIN_LOC = f"europe-west1-docker.pkg.dev/\
-    {PROJECT_ID}/mlops-project-image-repository/\
-    mlops-train:latest"
+IMAGE_TRAIN_LOC = (
+    "europe-west1-docker.pkg.dev/"
+    f"{PROJECT_ID}/mlops-project-image-repository/"
+    "mlops-train:latest"
+)
