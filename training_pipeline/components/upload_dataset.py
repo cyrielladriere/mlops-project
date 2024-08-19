@@ -1,16 +1,17 @@
 """Creates and runs upload_data component in kfp pipeline"""
-from pathlib import Path
 import tempfile
-from kfp.dsl import container_component, ContainerSpec
-import pandas as pd
+from pathlib import Path
 
+import pandas as pd
+from kfp.dsl import ContainerSpec, container_component
+
+from training_pipeline.components.utils import get_label_encoder, upload_blob
 from training_pipeline.config import (
     DATA_LOCATION,
     DATASET_NAME,
-    IMAGE_DATALOADER_LOC,
     FILE_BUCKET,
+    IMAGE_DATALOADER_LOC,
 )
-from training_pipeline.components.utils import get_label_encoder, upload_blob
 
 
 @container_component

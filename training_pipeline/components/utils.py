@@ -1,16 +1,16 @@
 """Helper functions for the MLOps Project."""
-from pathlib import Path
-import tempfile
-from typing import Any, Dict, List
 import pickle  # nosec
+import tempfile
+from pathlib import Path
+from typing import Any, Dict, List
 
 import pandas as pd
-from sklearn.metrics import precision_recall_fscore_support, accuracy_score
-from sklearn.preprocessing import LabelEncoder
 from datasets import Dataset
 from google.cloud import storage
+from sklearn.metrics import accuracy_score, precision_recall_fscore_support
+from sklearn.preprocessing import LabelEncoder
 
-from training_pipeline.config import FILE_BUCKET, LABEL_ENCODER_NAME, DATASET_NAME
+from training_pipeline.config import DATASET_NAME, FILE_BUCKET, LABEL_ENCODER_NAME
 
 
 def load_data() -> pd.DataFrame:

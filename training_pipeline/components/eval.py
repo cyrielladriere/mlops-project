@@ -1,20 +1,21 @@
 """Creates and runs the evaluation component in kfp pipeline"""
 import io
+
 import numpy as np
 import torch
-from kfp.dsl import container_component, ContainerSpec
+from kfp.dsl import ContainerSpec, container_component
 from transformers import BertForSequenceClassification
 
+from training_pipeline.components.utils import (
+    compute_metrics,
+    get_label_encoder,
+    read_blob,
+)
 from training_pipeline.config import (
     DATALOADER_NAME,
     FILE_BUCKET,
     IMAGE_TRAIN_LOC,
     MODEL_NAME,
-)
-from training_pipeline.components.utils import (
-    compute_metrics,
-    get_label_encoder,
-    read_blob,
 )
 
 

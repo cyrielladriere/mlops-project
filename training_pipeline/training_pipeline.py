@@ -1,5 +1,6 @@
 """Module for the news articles pipeline definition."""
 from kfp.dsl import pipeline
+
 from training_pipeline import config
 from training_pipeline.components.eval import eval_model_component
 from training_pipeline.components.train import train_model_component

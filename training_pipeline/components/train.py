@@ -1,22 +1,18 @@
 """Creates and runs training component in kfp pipeline"""
-from pathlib import Path
 import tempfile
-import torch
+from pathlib import Path
+
 import numpy as np
+import torch
+from keras.utils import to_categorical  # type: ignore
+from kfp.dsl import ContainerSpec, container_component
 from torch.utils.data import DataLoader
-from kfp.dsl import container_component, ContainerSpec
 from transformers import (
     BertForSequenceClassification,
-    get_linear_schedule_with_warmup,
     BertTokenizer,
+    get_linear_schedule_with_warmup,
 )
 
-from training_pipeline.config import (
-    DATALOADER_NAME,
-    FILE_BUCKET,
-    IMAGE_TRAIN_LOC,
-    MODEL_NAME,
-)
 from training_pipeline.components.utils import (
     compute_metrics,
     get_label_encoder,
@@ -24,7 +20,12 @@ from training_pipeline.components.utils import (
     preprocess_dataset,
     upload_blob,
 )
-from keras.utils import to_categorical  # type: ignore
+from training_pipeline.config import (
+    DATALOADER_NAME,
+    FILE_BUCKET,
+    IMAGE_TRAIN_LOC,
+    MODEL_NAME,
+)
 
 
 @container_component

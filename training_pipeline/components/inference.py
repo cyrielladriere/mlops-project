@@ -1,19 +1,16 @@
 """Inference implementation of news articles model"""
 import numpy as np
-from sklearn.preprocessing import LabelEncoder
 import torch
+from sklearn.preprocessing import LabelEncoder
 from torch.utils.data import DataLoader
-from transformers import (
-    BertForSequenceClassification,
-    BertTokenizer,
-)
+from transformers import BertForSequenceClassification, BertTokenizer
 
-from training_pipeline.config import MODEL_LOCATION
 from training_pipeline.components.utils import (
     get_label_encoder,
     load_data,
     preprocess_dataset,
 )
+from training_pipeline.config import MODEL_LOCATION
 
 
 def predict(input_json):

@@ -1,10 +1,12 @@
 """Deploys and runs the kfp news articles pipeline"""
-from pathlib import Path
 import subprocess  # nosec
 import tempfile
 import warnings
+from pathlib import Path
+
 from google.cloud import aiplatform
 from kfp.compiler import Compiler
+
 from training_pipeline import config
 from training_pipeline.training_pipeline import pipeline
 
