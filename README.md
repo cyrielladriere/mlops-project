@@ -41,18 +41,18 @@ First, we have to set up authentication:
 gcloud auth configure-docker europe-west1-docker.pkg.dev
 ```
 
-Once you are authenticated, run the `build_and_push_image.sh` bash script:
+Once you are authenticated, run the `build_and_push_all.sh` bash script:
 ```sh
-./training_pipeline/build_and_push_image.sh 
+./training_pipeline/images/build_and_push_all.sh 
 ```
-This script will build, tag, and push the image to the google cloud artifact registry inside our mlops GCP project. 
+This script will build, tag, and push the necessary images to the google cloud artifact registry inside our mlops GCP project. 
 
-A tip: I enabled image vulnerabilty scanning in the gcp registry by accident and got stuck with a sizeable bill, so do not enable this if it is not necesarry!
+A tip: I enabled image vulnerabilty scanning in the gcp registry by accident and got stuck with a sizeable bill, so do not enable this if it is not needed!
 
-**Note:** The created image is based on the Dockerfile in `training_pipeline/src/Dockerfile`
+**Note:** The created images are based on the Dockerfiles in `training_pipeline/images/{image_name}/Dockerfile`
 
 # Running Kubeflow Pipeline
-The Kubeflow Pipeline can be executed by running the following command (currently does not finish without error):
+The Kubeflow Pipeline can be executed by running the following command:
 ```sh
 python -m training_pipeline.deploy
 ```
