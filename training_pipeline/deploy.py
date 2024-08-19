@@ -11,7 +11,7 @@ from training_pipeline import config
 from training_pipeline.training_pipeline import pipeline
 
 
-def deploy_pipeline():
+def deploy_pipeline() -> None:
     aiplatform.init(
         project=config.PROJECT_ID,
         location=config.REGION,

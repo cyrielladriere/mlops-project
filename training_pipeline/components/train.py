@@ -29,7 +29,7 @@ from training_pipeline.config import (
 
 
 @container_component
-def train_model_component():
+def train_model_component() -> ContainerSpec:
     return ContainerSpec(
         image=IMAGE_TRAIN_LOC,
         command=["python", "-m", "training_pipeline.components.train"],

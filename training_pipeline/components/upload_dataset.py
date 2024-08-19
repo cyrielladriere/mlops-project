@@ -15,7 +15,7 @@ from training_pipeline.config import (
 
 
 @container_component
-def upload_data_component():
+def upload_data_component() -> ContainerSpec:
     return ContainerSpec(
         image=IMAGE_DATALOADER_LOC,
         command=["python", "-m", "training_pipeline.components.upload_dataset"],

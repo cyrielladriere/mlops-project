@@ -4,6 +4,7 @@ import tempfile
 from pathlib import Path
 from typing import Any, Dict, List
 
+import numpy as np
 import pandas as pd
 from datasets import Dataset
 from google.cloud import storage
@@ -113,7 +114,7 @@ def preprocess_dataset(data: pd.DataFrame, tokenizer) -> Dataset:
     return dataset
 
 
-def compute_metrics(pred, labels):
+def compute_metrics(pred: np.ndarray, labels: np.ndarray) -> Dict:
     labels = labels.argmax(-1)
     preds = pred.argmax(-1)
     precision, recall, f1, _ = precision_recall_fscore_support(
