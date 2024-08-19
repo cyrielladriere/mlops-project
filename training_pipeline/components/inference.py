@@ -13,9 +13,9 @@ from training_pipeline.components.utils import (
 from training_pipeline.config import MODEL_LOCATION
 
 
-def predict(input_json):
-    """Predict news categories based on news articles using a pre-trained model."""
-    data = load_data(input_json)
+def predict() -> np.ndarray:
+    """Predict news categories based on news articles using a pre-trained BERT model."""
+    data = load_data()
 
     label_encoder = get_label_encoder()
     n_classes = len(label_encoder.classes_)
