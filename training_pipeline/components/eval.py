@@ -1,3 +1,4 @@
+"""Creates and runs the evaluation component in kfp pipeline"""
 import io
 import numpy as np
 import torch

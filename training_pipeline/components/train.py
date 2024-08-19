@@ -1,3 +1,4 @@
+"""Creates and runs training component in kfp pipeline"""
 from pathlib import Path
 import tempfile
 import torch

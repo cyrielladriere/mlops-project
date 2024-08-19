@@ -1,3 +1,4 @@
+"""Creates and runs upload_data component in kfp pipeline"""
 from pathlib import Path
 import tempfile
 from kfp.dsl import container_component, ContainerSpec

@@ -1,3 +1,4 @@
+"""Inference implementation of news articles model"""
 import numpy as np
 from sklearn.preprocessing import LabelEncoder
 import torch

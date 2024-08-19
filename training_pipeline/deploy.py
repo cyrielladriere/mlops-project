@@ -1,3 +1,4 @@
+"""Deploys and runs the kfp news articles pipeline"""
 from pathlib import Path
 import subprocess  # nosec
 import tempfile
