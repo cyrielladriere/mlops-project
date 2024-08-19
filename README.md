@@ -59,5 +59,4 @@ python -m training_pipeline.deploy
 
 # TODO's
 - FIX: For some reason after downloading csv from gcp bucket we have ~2000 nan values in the "short desciption" column (nans were not present before upload to gcp), see `preprocess_dataset` function in `training_pipeline/components/utils.py`.(temp fix implemented: remove nans after pulling from bucket)
-- Add logging
 - Expand Readme with problem explanation and pipeline info
