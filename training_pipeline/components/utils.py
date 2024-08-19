@@ -23,7 +23,7 @@ def load_data() -> pd.DataFrame:
 
 def get_label_encoder(df: pd.DataFrame | None = None):
     """
-    Returns a fitted LabelEncoder for the news articles categories,
+    Return a fitted LabelEncoder for the news articles categories,
     either loading it from GCS or fitting it on provided data.
     """
     if df is None:
@@ -48,7 +48,7 @@ def upload_blob(
     bucket_name: str, source_file_path: str, destination_blob_name: str
 ) -> None:
     """
-    Uploads a file to a specified bucket in Google Cloud Storage.
+    Upload a file to a specified bucket in Google Cloud Storage.
 
     Args:
         bucket_name (str): The name of the bucket to upload the file to.
@@ -71,7 +71,7 @@ def upload_blob(
 
 def read_blob(bucket_name: str, file_name: str, text: bool = False) -> bytes:
     """
-    Reads a file from a Google Cloud Storage bucket.
+    Read a file from a Google Cloud Storage bucket.
 
     Args:
         bucket_name (str): The name of the GCP bucket.
@@ -120,7 +120,7 @@ def preprocess_dataset(data: pd.DataFrame, tokenizer) -> Dataset:
 
 def compute_metrics(pred: np.ndarray, labels: np.ndarray) -> Dict:
     """
-    Computes evaluation metrics (accuracy, F1 score, precision and recall)
+    Compute evaluation metrics (accuracy, F1 score, precision and recall)
     for model predictions.
     """
     labels = labels.argmax(-1)

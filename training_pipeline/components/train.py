@@ -1,4 +1,4 @@
-"""Creates and runs training component in kfp pipeline"""
+"""Creates and runs training component in kfp pipeline."""
 import tempfile
 from pathlib import Path
 
@@ -30,7 +30,7 @@ from training_pipeline.config import (
 
 @container_component
 def train_model_component() -> ContainerSpec:
-    """Defines a Kubeflow container component for training a BERT model."""
+    """Define a Kubeflow container component for training a BERT model."""
     return ContainerSpec(
         image=IMAGE_TRAIN_LOC,
         command=["python", "-m", "training_pipeline.components.train"],

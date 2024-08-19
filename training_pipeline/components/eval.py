@@ -1,4 +1,4 @@
-"""Creates and runs the evaluation component in kfp pipeline"""
+"""Creates and runs the evaluation component in kfp pipeline."""
 import io
 
 import numpy as np
@@ -21,7 +21,7 @@ from training_pipeline.config import (
 
 @container_component
 def eval_model_component() -> ContainerSpec:
-    """Defines a Kubeflow container component for evaluating a BERT model."""
+    """Define a Kubeflow container component for evaluating a BERT model."""
     return ContainerSpec(
         image=IMAGE_TRAIN_LOC,
         command=["python", "-m", "training_pipeline.components.eval"],

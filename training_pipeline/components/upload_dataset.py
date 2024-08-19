@@ -1,4 +1,4 @@
-"""Creates and runs upload_data component in kfp pipeline"""
+"""Creates and runs upload_data component in kfp pipeline."""
 import tempfile
 from pathlib import Path
 
@@ -17,7 +17,7 @@ from training_pipeline.config import (
 @container_component
 def upload_data_component() -> ContainerSpec:
     """
-    Defines a Kubeflow container component for uploading data
+    Define a Kubeflow container component for uploading data
     to a GCP storage bucket.
     """
     return ContainerSpec(
@@ -27,7 +27,7 @@ def upload_data_component() -> ContainerSpec:
 
 
 def upload_data() -> None:
-    """Uploads data and a fitted label encoder to GCP storage bucket."""
+    """Upload data and a fitted label encoder to GCP storage bucket."""
     df = pd.read_json(DATA_LOCATION, lines=True)
 
     get_label_encoder(df)

@@ -1,4 +1,4 @@
-"""Deploys and runs the kfp news articles pipeline"""
+"""Deploys and runs the kfp news articles pipeline."""
 import subprocess  # nosec
 import tempfile
 import warnings
