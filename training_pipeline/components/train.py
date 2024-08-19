@@ -30,6 +30,11 @@ def train_model_component():
 
 def train_model() -> None:
     """Train a predictive model to classify news articles into categories."""
+    if not torch.cuda.is_available():
+        return
+
+    device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
+
     # Get data
     df = load_data()
 
@@ -66,7 +71,6 @@ def train_model() -> None:
         optimizer, num_warmup_steps=0, num_training_steps=total_steps
     )
 
-    device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
     print("torch device: ", device)
     model.to(device)
 

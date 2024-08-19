@@ -21,6 +21,8 @@ def eval_model_component():
 
 def eval_model() -> None:
     """Predict news category for news articles using the trained model."""
+    if not torch.cuda.is_available():
+        return
     device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 
     dataloader_bytes = read_blob(FILE_BUCKET, DATALOADER_NAME)

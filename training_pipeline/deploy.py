@@ -22,7 +22,7 @@ def deploy_pipeline():
         warnings.simplefilter("ignore")
         Compiler().compile(pipeline_func=pipeline, package_path=temp_path)
 
-    subprocess.run(["./training_pipeline/build_and_push_image.sh"])  # nosec
+    subprocess.run(["./training_pipeline/images/build_and_push_image.sh"])  # nosec
 
     job = aiplatform.PipelineJob(
         display_name=config.PIPELINE_NAME,
