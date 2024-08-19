@@ -1,11 +1,10 @@
 # mlops-project
-!! This repository is a heavy Work In Progress!!
+This is an end-to-end MLOps project for training and evaluating a machine learning model using cloud resources (Google Cloud Platform).
 
-Our task: fine-tuning BERT to classify news articles into news categories. The plan is to expand this project to an mlops project. Using technologies such as: Terraform, Docker, KubeFlow Pipelines, cloud architecture (gcp).
+!! This repository is a heavy Work In Progress !!
 
-Current performance full_model on train set: /
-
-Current performance full_model on test set: /
+# Problem
+The problem itself is simple: fine-tuning a BERT transformer architecture to classify news articles into news categories. The pre-trained BERT model is imported from huggingface. Data and models are stored in gcp storage buckets. Kubeflow pipelines is used to create the machine learning pipeline in Vertex AI. This pipeline consists of multiple components (more info: [`training_pipeline/README.md`](./training_pipeline/README.md)), each with their own docker container image. These images are built and pushed to the Google Cloud Artifact Registry using the `training_pipeline/images/build_and_push_all.sh` script. All cloud resources and service accounts are created using Terraform (see `terraform` folder).
 
 Dataset: https://www.kaggle.com/datasets/rmisra/news-category-dataset?resource=download
 
@@ -35,7 +34,7 @@ When we actually want to apply the changes we can execute `terraform apply`:
 terraform apply -var-file="../environment/project.tfvars"
 ```
 
-# Building and pushing Docker image
+# Building and pushing Docker images
 First, we have to set up authentication:
 ```sh
 gcloud auth configure-docker europe-west1-docker.pkg.dev
@@ -45,17 +44,19 @@ Once you are authenticated, run the `build_and_push_all.sh` bash script:
 ```sh
 ./training_pipeline/images/build_and_push_all.sh 
 ```
-This script will build, tag, and push the necessary images to the google cloud artifact registry inside our mlops GCP project. 
+This script will build, tag, and push the necessary images to the google cloud artifact registry inside the mlops GCP project. 
 
 A tip: I enabled image vulnerabilty scanning in the gcp registry by accident and got stuck with a sizeable bill, so do not enable this if it is not needed!
 
 **Note:** The created images are based on the Dockerfiles in `training_pipeline/images/{image_name}/Dockerfile`
 
-# Running Kubeflow Pipeline
+# Running Kubeflow Pipeline in Vertex AI
 The Kubeflow Pipeline can be executed by running the following command:
 ```sh
 python -m training_pipeline.deploy
 ```
+
+More info on the pipeline in [`training_pipeline/README.md`](training_pipeline/README.md).
 
 # TODO's
 - FIX: For some reason after downloading csv from gcp bucket we have ~2000 nan values in the "short desciption" column (nans were not present before upload to gcp), see `preprocess_dataset` function in `training_pipeline/components/utils.py`.(temp fix implemented: remove nans after pulling from bucket)
