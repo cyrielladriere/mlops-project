@@ -67,3 +67,8 @@ More info on the pipeline in [`training_pipeline/README.md`](training_pipeline/R
 # TODO's
 - FIX: For some reason after downloading csv from gcp bucket we have ~2000 nan values in the "short desciption" column (nans were not present before upload to gcp), see `preprocess_dataset` function in `training_pipeline/components/utils.py`.(temp fix implemented: remove nans after pulling from bucket)
 - Expand pipeline with extra functionality
+- Add CI/CD pipeline with github actions.
+- Add testing (and add it in CI/CD pipeline)
+- Transfer deployment to a CI/CD job running in a container.
+- Add model experiment tracking (mlflow, tensorboard, ...)
+
