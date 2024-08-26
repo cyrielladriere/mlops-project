@@ -1,5 +1,6 @@
 """Creates and runs training component in kfp pipeline."""
 import logging
+import os
 import sys
 import tempfile
 from pathlib import Path
@@ -49,6 +50,7 @@ def train_model() -> None:
         logger.error("GPU not available")
         return
 
+    os.environ["PJRT_DEVICE"] = "CUDA"
     device = torch.device("cuda")
 
     logger.info("Loading data")
@@ -95,7 +97,7 @@ def train_model() -> None:
         all_labels = []
         for i, batch in enumerate(train_dataloader):
             # if i > 100: break
-            print(f"[Epoch: {epoch}] batch: {i}/{len(train_dataloader)}")
+            logger.info(f"[Epoch: {epoch}] batch: {i}/{len(train_dataloader)}")
             optimizer.zero_grad()
 
             batch = {k: v.to(device) for k, v in batch.items()}
