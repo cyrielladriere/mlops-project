@@ -1,8 +1,6 @@
 # mlops-project
 This is an end-to-end MLOps project for training and evaluating a machine learning model using cloud resources (Google Cloud Platform).
 
-!! This repository is a heavy Work In Progress !!
-
 # Problem
 The problem itself is simple: fine-tuning a BERT transformer architecture to classify news articles into news categories. 
 
